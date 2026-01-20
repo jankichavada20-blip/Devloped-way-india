@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mind Vision Power - E-Learning Platform</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { 
+            background: linear-gradient(135deg, #e3f2fd 0%, #f0f8ff 50%, #ffffff 100%); 
+            min-height: 100vh; line-height: 1.6; color: #333;
+        }
+        .navbar { background: rgba(25, 118, 210, 0.95); backdrop-filter: blur(10px); padding: 1rem 0; position: fixed; width: 100%; top: 0; z-index: 1000; }
+        .nav-container { max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; padding: 0 2rem; }
+        .logo { color: white; font-size: 1.8rem; font-weight: bold; }
+        .nav-links { display: flex; list-style: none; gap: 2rem; }
+        .nav-links a { color: white; text-decoration: none; font-weight: 500; transition: opacity 0.3s; }
+        .nav-links a:hover { opacity: 0.8; }
+        .auth-btns { display: flex; gap: 1rem; }
+        .btn { padding: 0.7rem 1.5rem; border-radius: 25px; text-decoration: none; font-weight: 500; transition: all 0.3s; cursor: pointer; border: none; }
+        .btn-primary { background: #1976d2; color: white; }
+        .btn-secondary { background: transparent; color: white; border: 2px solid white; }
+        .btn-logout { background: #f44336; color: white; padding: 0.5rem 1rem; border-radius: 20px; font-size: 0.9rem; }
+
+        .hero { background: linear-gradient(rgba(25,118,210,0.8), rgba(25,118,210,0.8)), url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 200"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="1" fill="white" opacity="0.1"/><circle cx="75" cy="75" r="0.5" fill="white" opacity="0.05"/></pattern></defs><rect width="100%" height="100%" fill="url(%23grain)"/></svg>'); 
+                     padding: 150px 2rem 100px; text-align: center; color: white; }
+        .hero h1 { font-size: 3.5rem; margin-bottom: 1rem; }
+        .hero p { font-size: 1.3rem; margin-bottom: 2rem; }
+
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 2rem; }
+        .section { padding: 80px 0; }
+        .section-title { text-align: center; font-size: 2.5rem; color: #1976d2; margin-bottom: 3rem; }
+        
+        .packages-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 2rem; }
+        .package-card { background: white; border-radius: 20px; padding: 2.5rem; box-shadow: 0 15px 40px rgba(0,0,0,0.1); transition: transform 0.3s, box-shadow 0.3s; }
+        .package-card:hover { transform: translateY(-10px); box-shadow: 0 25px 60px rgba(0,0,0,0.15); }
+        .package-price { font-size: 2.5rem; color: #1976d2; font-weight: bold; margin: 1rem 0; }
+        .package-features { list-style: none; margin: 1.5rem 0; }
+        .package-features li { padding: 0.5rem 0; border-bottom: 1px solid #e3f2fd; }
+
+        /* Modal Styles */
+        .modal { display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); backdrop-filter: blur(5px); }
+        .modal-content { background: white; margin: 5% auto; padding: 0; width: 90%; max-width: 500px; border-radius: 20px; overflow: hidden; animation: slideIn 0.3s ease; }
+        @keyframes slideIn { from { transform: translateY(-50px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        .modal-header { background: #1976d2; color: white; padding: 2rem; text-align: center; }
+        .modal-body { padding: 2.5rem; }
+        .form-group { margin-bottom: 1.5rem; }
+        .form-group label { display: block; margin-bottom: 0.5rem; color: #555; font-weight: 500; }
+        .form-control { width: 100%; padding: 1rem 1.2rem; border: 2px solid #e3f2fd; border-radius: 12px; font-size: 1rem; transition: border-color 0.3s; }
+        .form-control:focus { outline: none; border-color: #1976d2; box-shadow: 0 0 0 3px rgba(25,118,210,0.1); }
+        .form-row { display: flex; gap: 1rem; }
+        .form-row .form-control { flex: 1; }
+
+        /* Dashboard */
+        .dashboard { display: none; background: rgba(25,118,210,0.05); min-height: 100vh; padding-top: 120px; }
+        .dashboard-header { background: white; padding: 2rem; box-shadow: 0 5px 20px rgba(0,0,0,0.1); }
+        .user-info { display: flex; align-items: center; gap: 1rem; }
+        .user-avatar { width: 60px; height: 60px; border-radius: 50%; background: linear-gradient(135deg, #1976d2, #42a5f5); display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; }
+        .dashboard-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem; margin-top: 2rem; }
+        .dash-card { background: white; border-radius: 20px; padding: 2rem; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
+        .dash-card h3 { color: #1976d2; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem; }
+        .tabs { display: flex; gap: 1rem; margin-bottom: 2rem; flex-wrap: wrap; }
+        .tab-btn { padding: 1rem 2rem; border: 2px solid #e3f2fd; background: white; border-radius: 25px; cursor: pointer; transition: all 0.3s; }
+        .tab-btn.active { background: #1976d2; color: white; border-color: #1976d2; }
+
+        .alert { padding: 1rem; border-radius: 10px; margin: 1rem 0; }
+        .alert-success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .alert-error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+
+        @media (max-width: 768px) {
+            .nav-links { display: none; }
+            .hero h1 { font-size: 2.5rem; }
+            .form-row { flex-direction: column; }
+            .tabs { flex-direction: column; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar" id="navbar">
+        <div class="nav-container">
+            <div class="logo">🧠 Mind Vision Power</div>
+            <ul class="nav-links">
+                <li><a href="#home">Home</a></li>
+                <li><a href="#packages">Packages</a></li>
+                <li><a href="#about">About</a></li>
+                <li><a href="#contact">Contact</a></li>
+            </ul>
+            <div class="auth-btns" id="authBtns">
+                <a href="#" class="btn btn-secondary" onclick="showModal('login')">Login</a>
+                <a href="#" class="btn btn-primary" onclick="showModal('register')">Get Started</a>
+            </div>
+            <div id="userMenu" style="display:none;">
+                <span id="userNameNav" style="color:white;"></span>
+                <button class="btn-logout" onclick="logout()">Logout</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero" id="home">
+        <div class="container">
+            <h1>Unlock Your Mind's True Power</h1>
+            <p>India's #1 E-Learning Platform for Skills, Knowledge & Success</p>
+            <a href="#packages" class="btn btn-primary" style="font-size:1.2rem;padding:1rem 2.5rem;">Explore Packages</a>
+        </div>
+    </section>
+
+    <!-- Packages Section -->
+    <section class="section" id="packages">
+        <div class="container">
+            <h2 class="section-title">Choose Your Learning Package</h2>
+            <div class="packages-grid">
+                <div class="package-card">
+                    <h3>Starter</h3>
+                    <div class="package-price">₹999 <span style="font-size:1rem;color:#666;">/month</span></div>
+                    <ul class="package-features">
+                        <li>✅ 5 Courses Access</li>
+                        <li>✅ Basic Certificate</li>
+                        <li>✅ Community Access</li>
+                        <li>✅ Mobile Learning</li>
+                    </ul>
+                    <button class="btn btn-primary" onclick="showModal('payment', {package:'Starter', price:999})" style="width:100%;">Buy Now</button>
+                </div>
+                <div class="package-card">
+                    <h3>Pro</h3>
+                    <div class="package-price">₹12999 <span style="font-size:1rem;color:#666;">/month</span></div>
+                    <ul class="package-features">
+                        <li>✅ 25 Courses Access</li>
+                        <li>✅ Pro Certificate</li>
+                        <li>✅ Priority Support</li>
+                        <li>✅ Offline Download</li>
+                        <li>✅ Affiliate Program</li>
+                    </ul>
+                    <button class="btn btn-primary" onclick="showModal('payment', {package:'Pro', price:12999})" style="width:100%;">Buy Now</button>
+                </div>
+                <div class="package-card">
+                    <h3>Elite</h3>
+                    <div class="package-price">₹15999 <span style="font-size:1rem;color:#666;">/year</span></div>
+                    <ul class="package-features">
+                        <li>✅ Unlimited Courses</li>
+                        <li>✅ Elite Certificate</li>
+                        <li>✅ 1:1 Mentorship</li>
+                        <li>✅ Lifetime Access</li>
+                        <li>✅ 50% Affiliate Commission</li>
+                    </ul>
+                    <button class="btn btn-primary" onclick="showModal('payment', {package:'Elite', price:15999})" style="width:100%;">Buy Elite</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Login/Register Modal -->
+    <div id="authModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">Login</h2>
+            </div>
+            <div class="modal-body">
+                <div id="alertMsg" class="alert" style="display:none;"></div>
+                <form id="authForm">
+                    <div class="form-group" id="nameGroup" style="display:none;">
+                        <label>Full Name</label>
+                        <input type="text" class="form-control" id="regName" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Email</label>
+                        <input type="email" class="form-control" id="userEmail" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Password</label>
+                        <input type="password" class="form-control" id="userPass" required>
+                    </div>
+                    <div class="form-group" id="phoneGroup" style="display:none;">
+                        <label>Phone</label>
+                        <input type="tel" class="form-control" id="userPhone">
+                    </div>
+                    <button type="submit" class="btn btn-primary" style="width:100%;">Continue</button>
+                </form>
+                <div style="text-align:center;margin-top:1.5rem;">
+                    <a href="#" id="toggleAuth" style="color:#1976d2;">Create new account</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Payment Modal -->
+    <div id="paymentModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Complete Payment</h2>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Package</label>
+                    <span id="selectedPackage" style="font-size:1.2rem;font-weight:bold;color:#1976d2;"></span>
+                </div>
+                <div class="form-group">
+                    <label>Amount</label>
+                    <input type="number" class="form-control" id="8744981343-2@ybll" readonly>8744981343-2@ybll
+                </div>
+                <button class="btn btn-primary" onclick="processPayment()" style="width:100%;margin-bottom:1rem;">Pay with Razorpay/UPI</button>
+                <div style="font-size:0.9rem;color:#666;text-align:center;">💳 Secure Payment | 🔒 SSL Protected</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Dashboard -->
+    <div class="dashboard" id="dashboard">
+        <div class="dashboard-header">
+            <div class="container">
+                <div class="user-info">
+                    <div class="user-avatar" id="userAvatar">U</div>
+                    <div>
+                        <h2>Welcome Back, <span id="dashboardUserName"></span>!</h2>
+                        <p>Your membership is active till <span id="membershipExpiry"></span></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="container">
+            <div class="tabs">
+                <button class="tab-btn active" onclick="showTab('profile')">Profile</button>
+                <button class="tab-btn" onclick="showTab('kyc')">KYC</button>
+                <button class="tab-btn" onclick="showTab('payment')">Payments</button>
+                <button class="tab-btn" onclick="showTab('affiliate')">Affiliate</button>
+                <button class="tab-btn" onclick="showTab('courses')">My Courses</button>
+            </div>
+            
+            <div id="profileTab" class="dash-card">
+                <h3>👤 Profile Information</h3>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Name</label>
+                        <input type="text" class="form-control" id="dashName" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label>Email</label>
+                        <input type="email" class="form-control" id="dashEmail" readonly>
+                    </div>
+                </div>
+                <button class="btn btn-primary" onclick="toggleEdit('profile')">Edit Profile</button>
+            </div>
+
+            <div id="kycTab" class="dash-card" style="display:none;">
+                <h3>🆔 KYC Verification</h3>
+                <p id="kycStatus" style="color:#2e7d32;font-weight:bold;">✅ Verified</p>
+                <div class="form-group">
+                    <label>Aadhaar/PAN</label>
+                    <input type="file" class="form-control" accept="image/*,.pdf">
+                </div>
+                <button class="btn btn-primary">Submit KYC</button>
+            </div>
+
+            <div id="paymentTab" class="dash-card" style="display:none;">
+                <h3>💳 Payment History</h3>
+                <div style="background:#f8f9ff;padding:1.5rem;border-radius:12px;margin-bottom:1rem;">
+                    <h4>Pro Package - Active</h4>
+                    <p>₹2999 | Paid on Jan 20, 2026 | Expires Apr 20, 2026</p>
+                </div>
+                <button class="btn btn-primary" onclick="showModal('payment')">Upgrade Package</button>
+            </div>
+
+            <div id="affiliateTab" class="dash-card" style="display:none;">
+                <h3>👥 Affiliate Program</h3>
+                <p><strong>Your Referral Code:</strong> <span id="refCode" style="color:#1976d2;font-size:1.2rem;font-family:monospace;">MVP-XYZ123</span></p>
+                <p><strong>Your Link:</strong> <br>
+                    <input type="text" id="affiliateLink" value="mindvisionpower.com/ref/MVP-XYZ123" readonly style="width:100%;padding:1rem;border-radius:8px;border:2px solid #e3f2fd;">
+                </p>
+                <button class="btn btn-primary" onclick="copyReferralLink()">📋 Copy Link</button>
+                <p style="margin-top:1rem;font-size:0.9rem;color:#666;">Earn 30% commission on every referral!</p>
+            </div>
+
+            <div id="coursesTab" class="dash-card" style="display:none;">
+                <h3>📚 My Active Courses (5)</h3>
+                <div style="display:grid;gap:1rem;">
+                    <div style="background:#f0f8ff;padding:1.5rem;border-radius:12px;">
+                        <h4>Complete Web Development Bootcamp</h4>
+                        <p>Progress: 65% | Last Access: Today</p>
+                        <div style="width:65%;height:8px;background:#e3f2fd;border-radius:4px;margin-top:0.5rem;">
+                            <div style="width:65%;height:100%;background:linear-gradient(90deg,#1976d2,#42a5f5);border-radius:4px;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentUser = JSON.parse(localStorage.getItem('mvp_user')) || null;
+        let paymentData = {};
+        const packages = [
+            {name: 'Starter', price: 999, features: ['5 Courses', 'Basic Certificate']},
+            {name: 'Pro', price: 2999, features: ['25 Courses', 'Pro Certificate', 'Priority Support']},
+            {name: 'Elite', price: 5999, features: ['Unlimited Courses', 'Lifetime Access']}
+        ];
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            if (currentUser) {
+                showDashboard();
+            }
+            generateRefCode();
+        });
+
+        function showModal(type, data = {}) {
+            const modal = document.getElementById(type + 'Modal') || document.getElementById('authModal');
+            if (type === 'payment') {
+                paymentData = data;
+                document.getElementById('selectedPackage').textContent = data.package;
+                document.getElementById('paymentAmount').value = data.price;
+            }
+            modal.style.display = 'block';
+        }
+
+        function hideModal() {
+            document.querySelectorAll('.modal').forEach(m => m.style.display = 'none');
+        }
+
+        // Close modals on outside click
+        window.onclick = function(event) {
+            if (event.target.classList.contains('modal')) {
+                hideModal();
+            }
+        }
+
+        function showAlert(msg, type = 'success') {
+            const alert = document.getElementById('alertMsg');
+            alert.textContent = msg;
+            alert.className = `alert alert-${type}`;
+            alert.style.display = 'block';
+            setTimeout(() => alert.style.display = 'none', 4000);
+        }
+
+        function handleAuth(e) {
+            e.preventDefault();
+            const email = document.getElementById('userEmail').value;
+            const pass = document.getElementById('userPass').value;
+            const name = document.getElementById('regName')?.value;
+            const phone = document.getElementById('userPhone')?.value;
+            const isRegister = document.getElementById('nameGroup').style.display !== 'none';
+
+            if (isRegister) {
+                // Register
+                const user = { name, email, phone, pass, joined: new Date().toISOString(), refCode: 'MVP-' + Math.random().toString(36).substr(2, 6).toUpperCase() };
+                localStorage.setItem('mvp_user', JSON.stringify(user));
+                currentUser = user;
+                showAlert('Welcome to Mind Vision Power! Account created successfully.', 'success');
+                setTimeout(showDashboard, 1500);
+            } else {
+                // Login
+                if (currentUser && currentUser.email === email && currentUser.pass === pass) {
+                    showAlert('Login successful!', 'success');
+                    showDashboard();
+                } else {
+                    showAlert('Invalid credentials!', 'error');
+                }
+            }
+        }
+
+        function showDashboard() {
+            document.getElementById('dashboard').style.display = 'block';
+            document.getElementById('authBtns').style.display = 'none';
+            document.getElementById('userMenu').style.display = 'flex';
+            document.getElementById('userNameNav').textContent = currentUser.name;
+            document.getElementById('dashboardUserName').textContent = currentUser.name;
+            document.getElementById('dashName').value = currentUser.name;
+            document.getElementById('dashEmail').value = currentUser.email;
+            document.getElementById('refCode').textContent = currentUser.refCode;
+            document.getElementById('affiliateLink').value = `mindvisionpower.com/ref/${currentUser.refCode}`;
+            document.getElementById('userAvatar').textContent = currentUser.name[0];
+            document.getElementById('membershipExpiry').textContent = new Date(Date.now() + 90*24*60*60*1000).toLocaleDateString();
+            
+            // Smooth scroll to top
+            window.scrollTo({top: 0, behavior: 'smooth'});
+        }
+
+        function logout() {
+            currentUser = null;
+            localStorage.removeItem('mvp_user');
+            document.getElementById('dashboard').style.display = 'none';
+            document.getElementById('authBtns').style.display = 'flex';
+            document.getElementById('userMenu').style.display = 'none';
+            showAlert('Logged out successfully');
+        }
+
+        function showTab(tab) {
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            document.querySelectorAll('.dash-card').forEach(card => card.style.display = 'none');
+            document.getElementById(tab + 'Tab').style.display = 'block';
+        }
+
+        function processPayment() {
+            showAlert(`Payment of ₹${paymentData.price} for ${paymentData.package} processed successfully! 🎉`, 'success');
+            hideModal();
+            setTimeout(() => showTab('payment'), 1000);
+        }
+
+        function copyReferralLink() {
+            const link = document.getElementById('affiliateLink');
+            link.select();
+            document.execCommand('copy');
+            showAlert('Referral link copied! Share and earn commissions.');
+        }
+
+        function generateRefCode() {
+            if (!currentUser) return;
+            if (!currentUser.refCode) {
+                currentUser.refCode = 'MVP-' + Math.random().toString(36).substr(2, 6).toUpperCase();
+                localStorage.setItem('mvp_user', JSON.stringify(currentUser));
+            }
+        }
+
+        // Event Listeners
+        document.getElementById('authForm').addEventListener('submit', handleAuth);
+        document.getElementById('toggleAuth').onclick = function(e) {
+            e.preventDefault();
+            const isRegister = document.getElementById('modalTitle').textContent === 'Login';
+            document.getElementById('modalTitle').textContent = isRegister ? 'Create Account' : 'Login';
+            document.getElementById('nameGroup').style.display = isRegister ? 'block' : 'none';
+            document.getElementById('phoneGroup').style.display = isRegister ? 'block' : 'none';
+            document.getElementById('toggleAuth').textContent = isRegister ? 'Already have account? Login' : 'Create new account';
+        };
+
+        // Smooth scrolling for nav links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                target.scrollIntoView({ behavior: 'smooth' });
+            });
+        });
+    </script>
+</body>
+</html>
